@@ -20,29 +20,11 @@
             body::selection {
                 background: transparent;
             }
-
-            button {
-                display: none;
-            }
         </style>
     </head>
     <body class="uk-container uk-margin-top uk-overflow-hidden">
         <h1>Browser non supportato</h1>
-        <p>Il tuo browser <b>non</b> è supportato</p>
+        <p>Il tuo browser <b>non</b> supporta la API sperimentale "<i>Web Serial API</i>" presente sui browser Chromium.</p>
         <p>Utilizza l'ultima versione di Google Chrome, Microsoft Edge (Chromium) o un altro browser basato su Chromium per visualizzare la pagina</p>
-        <button class="chrome">Scarica Google Chrome</button>
-        <button class="edge">Scarica Microsoft Edge</button>
     </body>
-
-    <script>
-        document.querySelector(".chrome").style.display = "block";
-        document.querySelector(".edge").style.display = "block";
-
-        document.querySelector(".chrome").addEventListener("click", () => {
-            window.location.href = "https://www.google.com/chrome/";
-        });
-        document.querySelector(".edge").addEventListener("click", () => {
-            window.location.href = "https://www.microsoft.com/edge";
-        });
-    </script>
 </html>
