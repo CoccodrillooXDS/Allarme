@@ -178,10 +178,10 @@ async function leggiDatiDaPorta() {
 }
 
 async function chooseSerialDevice() {
-    if (!navigator.serial) {
-        UIkit.modal("#serialUnavailable").show();
-        return;
-    }
+    //if (!navigator.serial) {
+    //    UIkit.modal("#serialUnavailable").show();
+    //    return;
+    //}
     try {
         port = await navigator.serial.requestPort();
         var notification = UIkit.notification('Porta seriale selezionata');
