@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <title>Allarme</title>
+        <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+        <link rel="alternative icon" type="image/png" href="./favicon-16.png" sizes="16x16">
+        <link rel="alternative icon" type="image/png" href="./favicon-32.png" sizes="32x32">
+        <link rel="alternative icon" type="image/png" href="./favicon-48.png" sizes="48x48">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/uikit.min.css">
+        <link rel="stylesheet" href="css/bootstrap-icons.css">
+        <script src="js/uikit.min.js"></script>
+        <script src="js/uikit-icons.min.js"></script>
+        <noscript>
+            <style>
+                #noscript-warning {
+                    display: block;
+                    z-index: 9999;
+                    background-color: #cf6868;
+                }
+                .top, .bottom, #serialUnavailable, #enableNotif {
+                    display: none;
+                }
+            </style>
+            <div class="noscript-warning uk-container uk-margin-top uk-margin-bottom">
+                <h2>JavaScript disabilitato</h2>
+                <p>Per utilizzare questo sito è necessario abilitare JavaScript</p>
+                <p>Utilizza un browser basato su Chromium (come Google Chrome, Brave, Opera o Microsoft Edge) aggiornato all'ultima versione per visualizzare questa pagina correttamente</p>
+            </div>
+        </noscript>
+        <style>
+            body {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            body::selection {
+                background: transparent;
+            }
+
+            .tasto {
+                font-size: 3rem;
+            }
+
+            #rawData {
+                font-family: monospace;
+                resize: vertical;
+            }
+
+            html {
+                background-color: #f5f5f5;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+            }
+
+            .top {
+                width: 100%;
+                background-color: #f0f0f0;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        </style>
+    </head>
+
+    <body class="uk-flex uk-flex-column">
+        <div class="top uk-flex uk-flex-row uk-flex-middle" id="top">
+            <div class="uk-container uk-margin-top uk-margin-bottom" id="titolo">
+                <h2>
+                    Allarme
+                    <button title="Impostazioni" class="uk-button uk-button-default uk-button-small" onclick="impostazioni()" id="impostazionibutton"><i class="bi bi-gear-fill"></i></button>
+                    <button title="Disconnetti la porta seriale" class="uk-button uk-button-default uk-button-small disconnectbutton" onclick="disconnectSerialDevice()" id="disconnectbutton"><i class=" bi bi-usb-symbol"></i><i class=" bi bi-x-circle-fill"></i></button>
+                </h2>
+            </div>
+            <div class="uk-container uk-margin-top uk-margin-bottom">
+                <div>Stato porta seriale: <span id="serialStatus" class="uk-label uk-label-danger">Disconnesso</span></div>
+                <div>Stato notifiche: <span id="notificationStatus" class="uk-label uk-label-danger">Disattivate</span></div>
+            </div>
+        </div>
+        <div class="bottom uk-flex uk-flex-column uk-flex-middle uk-margin-top uk-margin-bottom uk-margin-left uk-margin-right" id="bottom">
+            <div>Stato allarme: <span id="alarmStatus" class="uk-label">Non disponibile</span></div>
+            <div>Distanza ostacolo: <span id="distOstacolo" class="uk-label">Non disponibile</span></div>
+            <div class="uk-flex uk-flex-row uk-margin-top" id="pulsanti">
+                <button id="buttDisarma" class="uk-width-small uk-button uk-button-default uk-margin-small-right uk-margin-small-bottom" onclick="disarmaAllarme()" disabled>
+                    <div class="uk-margin-small-top"><i class="tasto bi-shield-x"></i><br>Disarma</div>
+                </button>
+                <button id="buttArma" class="uk-width-small uk-button uk-button-default uk-margin-small-right uk-margin-small-bottom" onclick="armaAllarme()" disabled>
+                    <div class="uk-margin-small-top"><i class="tasto bi-shield"></i><br>Arma</div>
+                </button>
+                <button id="buttStorico" class="uk-width-small uk-button uk-button-default uk-margin-small-right uk-margin-small-bottom" disabled>
+                    <div class="uk-margin-small-top"><i class="tasto bi-clock-history"></i><br>Storico</div>
+                </button>
+                <button id="buttTerminale" class="uk-width-small uk-button uk-button-default uk-margin-small-bottom" disabled>
+                    <div class="uk-margin-small-top"><i class="tasto bi-terminal"></i><br>Terminale</div>
+                </button>
+            </div>
+        </div>
+    </body>
+
+    <div id="impostazioni" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-margin uk-margin-auto-vertical">
+            <h2 class="uk-modal-title"><b>Impostazioni</b></h2>
+            <p>Qui puoi connetterti ad una porta seriale e gestire le impostazioni del sito.</p>
+            <div class="uk-margin">
+                <b>Porta seriale: </b><br>
+                <button title="Seleziona una porta seriale" class="uk-button uk-button-default uk-margin-small-bottom" onclick="chooseSerialDevice()" id="chooseDevice"><i class="bi bi-usb-symbol"></i> Seleziona dispositivo</button><br>
+                <b>Velocità di comunicazione: </b>
+                <select id="baudRate" class="uk-select uk-margin-small-bottom">
+                    <option value="300">300 baud</option>
+                    <option value="1200">1200 baud</option>
+                    <option value="2400">2400 baud</option>
+                    <option value="4800">4800 baud</option>
+                    <option value="9600" selected="selected">9600 baud (predefinita Arduino)</option>
+                    <option value="14400">14400 baud</option>
+                    <option value="19200">19200 baud</option>
+                    <option value="28800">28800 baud</option>
+                    <option value="38400">38400 baud</option>
+                    <option value="57600">57600 baud</option>
+                    <option value="76800">76800 baud</option>
+                    <option value="115200">115200 baud</option>
+                    <option value="230400">230400 baud</option>
+                    <option value="250000">250000 baud</option>
+                    <option value="500000">500000 baud</option>
+                    <option value="1000000">1000000 baud</option>
+                    <option value="2000000">2000000 baud</option>
+                </select>
+                <div>
+                    <button title="Connetti" class="uk-button uk-button-default" onclick="connectSerialDevice()" id="connectbutton"><i class="bi bi-check2-square"></i> Connetti</button>
+                </div>
+            </div>
+            <div class="uk-margin">
+                <b>Notifiche: </b><br>
+                <button title="Attiva le notifiche" class="uk-button uk-button-secondary uk-margin-small-bottom" onclick="gestioneNotifiche()" id="notifButt">Attiva notifiche</button><br>
+                <input class="uk-checkbox" type="checkbox" id="notificheAllarmeArmato"> <label for="notificheAllarmeArmato">Notifiche allarme armato</label><br>
+                <input class="uk-checkbox" type="checkbox" id="notificheAllarmeDisarmato"> <label for="notificheAllarmeDisarmato">Notifiche allarme disarmato</label><br>
+                <input class="uk-checkbox" type="checkbox" id="notificheAllarmeScattato"> <label for="notificheAllarmeScattato">Notifiche allarme scattato</label><br>
+                <input class="uk-checkbox" type="checkbox" id="notificheStatoSeriale"> <label for="notificheStatoSeriale">Notifiche stato della porta seriale</label><br>
+            </div>
+            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button> 
+        </div>
+    </div>
+
+    <div id="serialUnavailable" uk-modal esc-close=false bg-close=false>
+        <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+            <h2 class="uk-modal-title"><b>Porte seriali non supportate</b></h2>
+            <p>Il tuo browser <b>non</b> supporta le porte seriali</p>
+            <p>Utilizza Google Chrome, Microsoft Edge (Chromium) o un altro browser basato su Chromium</p>
+            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button> 
+        </div>
+    </div>
+
+    <div id="enableNotif" uk-modal esc-close=false bg-close=false>
+        <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+            <h2 class="uk-modal-title"><b>Abilita notifiche</b></h2>
+            <p>Questo sito può inviare delle notifiche in caso di cambiamenti.</p>
+            <p>Per abilitare le notifiche seleziona "Consenti" o clicca sull'icona <i class="bi bi-info-circle"></i> nella barra degli indirizzi, abilita le notifiche e ricarica la pagina.</p>
+            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button> 
+        </div>
+    </div>
+
+    <div id="terminale" uk-modal esc-close=false bg-close=false>
+        <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+            <h2 class="uk-modal-title"><b>Terminale</b></h2>
+            <p>Qui puoi visualizzare i dati provenienti dalla porta seriale.<br>
+            Per inviare dati alla porta seriale, scrivi nella casella di testo e premi Invio o il pulsante <i class="bi bi-send-fill"></i>.</p>
+            <textarea title="Terminale" id="rawData" class="uk-textarea" rows="10" readonly></textarea>
+            <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar uk-height-match>
+                <input title="Casella di testo" id="rawInput" class="uk-input" type="text" placeholder="Scrivi il comando e premi invio">
+                <button title="Invia" class="uk-button uk-button-default uk-button-small" onclick="terminalSendData()"><i class="bi bi-send-fill"></i></button>
+                <button title="Svuota terminale" class="uk-button uk-button-default uk-button-small" onclick="document.getElementById('rawData').value = ''"><i class="bi bi-trash3-fill"></i></button>
+            </nav>
+            <button title="Chiudi terminale" class="uk-modal-close-default" type="button" uk-close></button> 
+        </div>
+    </div>
+
+    <script>
+        // Quando la pagina è stata caricata, viene caricato lo script per la gestione della pagina
+        window.onload = function() {
+            if (location.protocol !== "https:" && location.protocol !== "file:") {
+                location.protocol = "https:";
+                return;
+            }
+            var buttafuori = document.createElement('script');
+            buttafuori.src = 'js/buttafuori.js';
+            document.body.appendChild(buttafuori);
+            var script = document.createElement('script');
+            script.src = 'js/webpage.js';
+            document.body.appendChild(script);
+        }
+    </script>
+</html>
