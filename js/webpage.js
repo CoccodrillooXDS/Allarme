@@ -1,7 +1,9 @@
 const rawData = document.getElementById("rawData");
+const storicoTable = document.getElementById("storicoTable");
 const rawInput = document.getElementById("rawInput");
 
 var pulsanteTerminale = document.getElementById("buttTerminale");
+var pulsanteStorico = document.getElementById("buttStorico");
 var pulsanteArmaAllarme = document.getElementById("buttArma");
 var pulsanteDisarmaAllarme = document.getElementById("buttDisarma");
 var notificationStatus = document.getElementById("notificationStatus");
@@ -26,11 +28,17 @@ const COMANDO_DISARMA_ALLARME = "CAD";
 const ACKNOWLEDGE = "ACK";
 const COMANDO_ERRATO = "CE";
 const ALLARME_ARMATO = "AA";
+const DESC_ALLARME_ARMATO = "Allarme armato";
 const ALLARME_DISARMATO = "AD";
+const DESC_ALLARME_DISARMATO = "Allarme disarmato";
 const ALLARME_SCATTATO_LUCE = "ASL";
+const DESC_ALLARME_SCATTATO_LUCE = "Allarme scattato - luce accesa";
 const ALLARME_SCATTATO_PORTA = "ASP";
+const DESC_ALLARME_SCATTATO_PORTA = "Allarme scattato - porta aperta";
 const ALLARME_SCATTATO_OSTACOLO = "ASO";
+const DESC_ALLARME_SCATTATO_OSTACOLO = "Allarme scattato - ostacolo rilevato";
 const ALLARME_SCATTATO_INFRAROSSI = "ASI";
+const DESC_ALLARME_SCATTATO_INFRAROSSI = "Allarme scattato - infrarossi rilevati";
 const SENSORE_ULTRASUONI = "SUS";
 
 //  =========================
@@ -86,6 +94,41 @@ window.addEventListener("resize", handleWindowResize);
 // Effettua il controllo forzato delle dimensioni della finestra una volta caricato lo script
 handleWindowResize();
 
+//  ========================
+//      SEZIONE STORICO
+//  ========================
+
+// Evento che apre la finestra del terminale
+pulsanteStorico.addEventListener("click", function() {
+    UIkit.modal("#storico").show();
+});
+
+function aggiornaTabella(evento) {
+    if (storicoTable.rows[0].cells[1].textContent === 'Nessun evento') {
+        storicoTable.deleteRow(0);
+    }
+    var row = storicoTable.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.textContent = '0';
+    cell2.textContent = evento;
+    for (var i = 1; i < storicoTable.rows.length; i++) {
+        var cell = storicoTable.rows[i].cells[0];
+        cell.textContent = parseInt(cell.textContent) + 1;
+    }
+}
+
+async function resettaTabella() {
+    while (storicoTable.rows.length > 0) {
+        storicoTable.deleteRow(0);
+    }
+    var row = storicoTable.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.textContent = '-';
+    cell2.textContent = 'Nessun evento';
+}
+
 //  =========================
 //      SEZIONE TERMINALE
 //  =========================
@@ -95,6 +138,7 @@ pulsanteTerminale.addEventListener("click", function() {
     UIkit.modal("#terminale").show();
     rawInput.focus();
     rawInput.select();
+    rawData.scrollTop = rawData.scrollHeight;
 });
 
 // Funzione che invia i dati inseriti nel campo di testo del terminale
@@ -165,8 +209,12 @@ async function leggiDatiDaPorta() {
         var notification = UIkit.notification('Si è verificato un errore durante la lettura dei dati dalla porta seriale');
         if (statoNotifiche && notificheStatoSeriale.checked) {
             var notification = new Notification('Allarme: Stato porta seriale', {
-                body: "Si è verificato un errore durante la lettura dei dati: " + error
+                body: "Si è verificato un errore durante la lettura dei dati: " + error,
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 1500);
         }
     }
     finally {
@@ -184,7 +232,10 @@ async function chooseSerialDevice() {
     }
     try {
         port = await navigator.serial.requestPort();
-        var notification = UIkit.notification('Porta seriale selezionata');
+        var notification = UIkit.notification({
+            message: 'Porta seriale selezionata',
+            timeout: 500
+        });
         document.getElementById("connectbutton").classList.remove("uk-button-default");
         document.getElementById("connectbutton").classList.add("uk-button-primary");
     } catch (error) {
@@ -193,16 +244,26 @@ async function chooseSerialDevice() {
             var notification = UIkit.notification('Errore di sicurezza. Controlla la console per maggiori informazioni');
             if (statoNotifiche && notificheStatoSeriale.checked) {
                 var notification = new Notification('Allarme: Stato porta seriale', {
-                    body: "Si è verificato un errore di sicurezza: " + error
+                    body: "Si è verificato un errore di sicurezza: " + error,
+                    requireInteraction: false
                 });
+                setTimeout(function() {
+                    notification.close();
+                    notification.close();
+                }, 1500);
             }
             console.log("Errore durante la selezione della porta seriale: " + error);
         } else {
             var notification = UIkit.notification('Errore durante la selezione della porta seriale. Controlla la console per maggiori informazioni');
             if (statoNotifiche && notificheStatoSeriale.checked) {
                 var notification = new Notification('Allarme: Stato porta seriale', {
-                    body: "Si è verificato un errore durante la selezione della porta seriale: " + error
+                    body: "Si è verificato un errore durante la selezione della porta seriale: " + error,
+                    requireInteraction: false
                 });
+                setTimeout(function() {
+                    notification.close();
+                    notification.close();
+                }, 1500);
             }
             console.log("Errore durante la selezione della porta seriale: " + error);
         }
@@ -215,10 +276,14 @@ async function connectSerialDevice() {
         return;
     }
     if (port == null) {
-        var notification = UIkit.notification('Nessuna porta seriale selezionata');
+        var notification = UIkit.notification({
+            message: 'Nessuna porta seriale selezionata',
+            timeout: 500
+        });
         return;
     }
     try {
+        await resettaTabella();
         await port.open({ baudRate: document.getElementById("baudRate").value });
         await disconnectSerialDevice(true);
         selPort = port;
@@ -226,11 +291,18 @@ async function connectSerialDevice() {
             statoPortaSeriale = true;
             leggiDatiDaPorta();
         }
-        var notification = UIkit.notification('Connesso alla porta seriale');
+        var notification = UIkit.notification({
+            message: 'Connesso alla porta seriale',
+            timeout: 500
+        });
         if (statoNotifiche && notificheStatoSeriale.checked) {
             var notification = new Notification('Allarme: Stato porta seriale', {
-                body: 'Connesso con successo!'
+                body: 'Connesso con successo!',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 1500);
         }
         console.log("Connesso alla porta seriale");
         serialStatus.innerHTML = "Connesso";
@@ -243,31 +315,49 @@ async function connectSerialDevice() {
         if (error.name == "NotFoundError") {}
         else if (error.name == "InvalidStateError") {
             if (selPort != null) {
-                var notification = UIkit.notification('Dispositivo già connesso');
+                var notification = UIkit.notification({
+                    message: 'Dispositivo già connesso',
+                    timeout: 500
+                });
                 console.log("Dispositivo già connesso " + error);
             }
         } else if (error.name == "NetworkError") {
             var notification = UIkit.notification('La porta seriale è attualmente in uso da un altro programma');
             if (statoNotifiche && notificheStatoSeriale.checked) {
                 var notification = new Notification('Allarme: Stato porta seriale', {
-                    body: 'In uso da un altro programma'
+                    body: 'In uso da un altro programma',
+                    requireInteraction: false
                 });
+                setTimeout(function() {
+                    notification.close();
+                    notification.close();
+                }, 1500);
             }
             console.log("Errore durante la connessione alla porta seriale: " + error);
         } else if (error.name == "SecurityError") {
             var notification = UIkit.notification('Errore di sicurezza. Controlla la console per maggiori informazioni');
             if (statoNotifiche && notificheStatoSeriale.checked) {
                 var notification = new Notification('Allarme: Stato porta seriale', {
-                    body: "Si è verificato un errore di sicurezza: " + error
+                    body: "Si è verificato un errore di sicurezza: " + error,
+                    requireInteraction: false
                 });
+                setTimeout(function() {
+                    notification.close();
+                    notification.close();
+                }, 1500);
             }
             console.log("Errore durante la selezione della porta seriale: " + error);
         } else {
-            var notification = UIkit.notification('Errore nella connessione alla porta seriale. Controlla la console per maggiori informazioni');
+            var notification = UIkit.notification('Errore durante la connessione alla porta seriale. Controlla la console per maggiori informazioni');
             if (statoNotifiche && notificheStatoSeriale.checked) {
                 var notification = new Notification('Allarme: Stato porta seriale', {
-                    body: "Si è verificato un errore durante la connessione alla porta seriale: " + error
+                    body: "Si è verificato un errore durante la connessione alla porta seriale: " + error,
+                    requireInteraction: false
                 });
+                setTimeout(function() {
+                    notification.close();
+                    notification.close();
+                }, 1500);
             }
             console.log("Errore durante la connessione alla porta seriale: " + error);
         }
@@ -298,11 +388,18 @@ async function disconnectSerialDevice(silent = false) {
     serialStatus.classList.remove("uk-label-success");
     serialStatus.classList.add("uk-label-danger");
     if (!silent) {
-        var notification = UIkit.notification('Disconnesso dalla porta seriale');
+        var notification = UIkit.notification({
+            message: 'Disconnesso dalla porta seriale',
+            timeout: 500
+        });
         if (statoNotifiche && notificheStatoSeriale.checked) {
             var notification = new Notification('Allarme: Stato porta seriale', {
-                body: 'Disconnesso con successo!'
+                body: 'Disconnesso con successo!',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 1500);
         }
         console.log("Disconnesso dalla porta seriale");
     }
@@ -342,10 +439,15 @@ function readData(data) {
         htmlStatoAllarme.classList.remove("uk-label-danger");
         pulsanteDisarmaAllarme.removeAttribute("disabled");
         pulsanteArmaAllarme.setAttribute("disabled", "");
+        aggiornaTabella(DESC_ALLARME_ARMATO);
         if (statoNotifiche && notificheAllarmeArmato.checked) {
             var notification = new Notification('Allarme: Stato allarme', {
-                body: 'Armato'
+                body: 'Armato',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 1500);
         }
         var notification = UIkit.notification('Allarme armato');
         console.log("Allarme armato");
@@ -357,10 +459,15 @@ function readData(data) {
         htmlStatoAllarme.classList.remove("uk-label-danger");
         pulsanteDisarmaAllarme.setAttribute("disabled", "");
         pulsanteArmaAllarme.removeAttribute("disabled");
+        aggiornaTabella(DESC_ALLARME_DISARMATO);
         if (statoNotifiche && notificheAllarmeArmato.checked) {
             var notification = new Notification('Allarme: Stato allarme', {
-                body: 'Disarmato'
+                body: 'Disarmato',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 1500);
         }
         var notification = UIkit.notification('Allarme disarmato');
         console.log("Allarme disarmato");
@@ -373,71 +480,98 @@ function readData(data) {
         }
     } else if (data == ALLARME_SCATTATO_LUCE) {
         statoAllarme = true;
-        htmlStatoAllarme.innerHTML = "Allarme scattato - Luce accesa";
+        htmlStatoAllarme.innerHTML = DESC_ALLARME_SCATTATO_LUCE;
         htmlStatoAllarme.classList.remove("uk-label-success");
         htmlStatoAllarme.classList.remove("uk-label-warning");
         htmlStatoAllarme.classList.add("uk-label-danger");
         pulsanteArmaAllarme.setAttribute("disabled", "");
         pulsanteDisarmaAllarme.removeAttribute("disabled");
+        aggiornaTabella(DESC_ALLARME_SCATTATO_LUCE);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'La luce è stata accesa'
+                body: 'La luce è stata accesa',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 2000);
         }
         var notification = UIkit.notification('Allarme scattato: luce accesa');
         console.log("Allarme scattato: luce accesa");
     } else if (data == ALLARME_SCATTATO_PORTA) {
         statoAllarme = true;
-        htmlStatoAllarme.innerHTML = "Allarme scattato - Porta aperta";
+        htmlStatoAllarme.innerHTML = DESC_ALLARME_SCATTATO_PORTA;
         htmlStatoAllarme.classList.remove("uk-label-success");
         htmlStatoAllarme.classList.remove("uk-label-warning");
         htmlStatoAllarme.classList.add("uk-label-danger");
         pulsanteArmaAllarme.setAttribute("disabled", "");
         pulsanteDisarmaAllarme.removeAttribute("disabled");
+        aggiornaTabella(DESC_ALLARME_SCATTATO_PORTA);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'La porta è stata aperta'
+                body: 'La porta è stata aperta',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 2000);
         }
         var notification = UIkit.notification('Allarme scattato: porta aperta');
         console.log("Allarme scattato: porta aperta");
     } else if (data == ALLARME_SCATTATO_OSTACOLO) {
         statoAllarme = true;
-        htmlStatoAllarme.innerHTML = "Allarme scattato - Ostacolo rilevato";
+        htmlStatoAllarme.innerHTML = DESC_ALLARME_SCATTATO_OSTACOLO;
         htmlStatoAllarme.classList.remove("uk-label-success");
         htmlStatoAllarme.classList.remove("uk-label-warning");
         htmlStatoAllarme.classList.add("uk-label-danger");
         pulsanteArmaAllarme.setAttribute("disabled", "");
         pulsanteDisarmaAllarme.removeAttribute("disabled");
+        aggiornaTabella(DESC_ALLARME_SCATTATO_OSTACOLO);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'Un ostacolo è stato rilevato'
+                body: 'Un ostacolo è stato rilevato',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 2000);
         }
         var notification = UIkit.notification('Allarme scattato: ostacolo rilevato');
         console.log("Allarme scattato: ostacolo rilevato");
     } else if (data == ALLARME_SCATTATO_INFRAROSSI) {
         statoAllarme = true;
-        htmlStatoAllarme.innerHTML = "Allarme scattato - Infrarossi rilevato";
+        htmlStatoAllarme.innerHTML = DESC_ALLARME_SCATTATO_INFRAROSSI;
         htmlStatoAllarme.classList.remove("uk-label-success");
         htmlStatoAllarme.classList.remove("uk-label-warning");
         htmlStatoAllarme.classList.add("uk-label-danger");
         pulsanteArmaAllarme.setAttribute("disabled", "");
         pulsanteDisarmaAllarme.removeAttribute("disabled");
+        aggiornaTabella(DESC_ALLARME_SCATTATO_INFRAROSSI);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'Infrarossi rilevati'
+                body: 'Infrarossi rilevati',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 2000);
         }
         var notification = UIkit.notification('Allarme scattato: infrarossi rilevato');
         console.log("Allarme scattato: infrarossi rilevato");
     } else if (data == COMANDO_ERRATO) {
         if (statoNotifiche) {
             var notification = new Notification('Allarme: Comando errato', {
-                body: 'Il comando inviato non è stato riconosciuto'
+                body: 'Il comando inviato non è stato riconosciuto',
+                requireInteraction: false
             });
+            setTimeout(function() {
+                notification.close();
+            }, 1500);
         }
-        var notification = UIkit.notification('Comando errato');
+        var notification = UIkit.notification({
+            message: 'Comando errato',
+            timeout: 500
+        });
         console.log("Comando errato");
     }
 }

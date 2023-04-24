@@ -64,6 +64,10 @@
                 background-color: #f0f0f0;
                 border-bottom: 1px solid #e0e0e0;
             }
+
+            .max300 {
+                max-height: 300px;
+            }
         </style>
     </head>
 
@@ -91,7 +95,7 @@
                 <button id="buttArma" class="uk-width-small uk-button uk-button-default uk-margin-small-right uk-margin-small-bottom" onclick="armaAllarme()" disabled>
                     <div class="uk-margin-small-top"><i class="tasto bi-shield"></i><br>Arma</div>
                 </button>
-                <button id="buttStorico" class="uk-width-small uk-button uk-button-default uk-margin-small-right uk-margin-small-bottom" disabled>
+                <button id="buttStorico" class="uk-width-small uk-button uk-button-default uk-margin-small-right uk-margin-small-bottom">
                     <div class="uk-margin-small-top"><i class="tasto bi-clock-history"></i><br>Storico</div>
                 </button>
                 <button id="buttTerminale" class="uk-width-small uk-button uk-button-default uk-margin-small-bottom" disabled>
@@ -100,6 +104,29 @@
             </div>
         </div>
     </body>
+
+    <div id="storico" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-margin uk-margin-auto-vertical">
+            <h2 class="uk-modal-title"><b>Storico</b></h2>
+            <p>Qui puoi vedere lo storico degli eventi riguardanti l'ultima porta seriale utilizzata.</p>
+            <div class="uk-margin uk-overflow-auto max300">
+                <table class="uk-table uk-table-divider uk-overflow-auto">
+                    <thead>
+                        <tr>
+                            <th class="uk-table-shrink">Numero evento</th>
+                            <th>Evento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="storicoTable">
+                        <tr>
+                            <td> - </td>
+                            <td>Nessun evento</td>
+                        </tr>
+                    </tbody>  
+                </table>
+            </div>
+            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button>
+    </div>
 
     <div id="impostazioni" uk-modal>
         <div class="uk-modal-dialog uk-modal-body uk-margin uk-margin-auto-vertical">
@@ -140,7 +167,7 @@
                 <input class="uk-checkbox" type="checkbox" id="notificheAllarmeScattato"> <label for="notificheAllarmeScattato">Notifiche allarme scattato</label><br>
                 <input class="uk-checkbox" type="checkbox" id="notificheStatoSeriale"> <label for="notificheStatoSeriale">Notifiche stato della porta seriale</label><br>
             </div>
-            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button> 
+            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button>
         </div>
     </div>
 
@@ -149,7 +176,7 @@
             <h2 class="uk-modal-title"><b>Porte seriali non supportate</b></h2>
             <p>Il tuo browser <b>non</b> supporta le porte seriali</p>
             <p>Utilizza Google Chrome, Microsoft Edge (Chromium) o un altro browser basato su Chromium</p>
-            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button> 
+            <button title="Chiudi popup" class="uk-modal-close-default" type="button" uk-close></button>
         </div>
     </div>
 
@@ -180,7 +207,7 @@
     <script>
         // Quando la pagina è stata caricata, viene caricato lo script per la gestione della pagina
         window.onload = function() {
-            if (location.protocol !== "https:" && location.protocol !== "file:") {
+            if (location.protocol !== "https:" && location.protocol !== "file:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
                 location.protocol = "https:";
                 return;
             }
