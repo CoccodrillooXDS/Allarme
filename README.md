@@ -34,7 +34,7 @@ Il sistema deve poter essere **attivato** e **disattivato** tramite un ***pulsan
 
 ## Software
 - **[Arduino IDE](https://www.arduino.cc/en/software)**;
-- **Browser basato su Chromium con supporto a Web Serial API** (*[Google Chrome](https://www.google.it/intl/it/chrome/)*, *[Microsoft Edge](https://www.microsoft.com/en-us/edge)*, *[Brave](https://brave.com/it/download/)*, ecc.).
+- **Browser basato su Chromium con supporto a Web Serial API** (*[Google Chrome](https://www.google.it/intl/it/chrome/)*, *[Microsoft Edge](https://www.microsoft.com/en-us/edge)*, *[Vivaldi](https://vivaldi.com/)* ecc.).
 
 ---
 
