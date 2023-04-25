@@ -71,12 +71,22 @@ Questo progetto è stato progettato per funzionare con l'adattatore **CP210x**.
 
 ---
 
+## Caricare lo sketch su Arduino
+Per poter proseguire e rendere funzionante il sistema di allarme, è necessario caricare lo sketch **[radio_arduino.ino](arduino/radio_arduino/radio_arduino.ino)** su Arduino e realizzare il [circuito](#circuito).
+
+- Collegare Arduino al computer;
+- Aprire lo sketch **[radio_arduino.ino](arduino/radio_arduino/radio_arduino.ino)** utilizzando l'**IDE di Arduino**;
+- Installare la libreria ***[LiquidCrystal](https://www.arduino.cc/en/Reference/LiquidCrystal)***;
+- Effettuare l'upload con l'apposito pulsante;
+- Scollegare Arduino dal computer;
+- Montare il **[circuito](#circuito)**.
+
 ## Come visualizzare i dati ricevuti dal modulo radio APC220?
 Per visualizzare i dati ricevuti dal modulo APC220, è possibile utilizzare un adattatore **UART-USB** (CP210x) o un altro Arduino.
 
 - Collegare l'adattatore o l'Arduino al PC;
 - Aprire la pagina web del progetto **[https://coccodrillooxds.github.io/Allarme/](https://coccodrillooxds.github.io/Allarme/)**;
-  - *Utilizzare un browser basato su **Chromium** aggiornato all'ultima versione*;
+  - *Utilizzare un browser basato su **Chromium** con supporto alla "Web Serial API" aggiornato all'ultima versione*;
 - Cliccare sul pulsante per le impostazioni;
 - Selezionare la porta corretta;
 - Cliccare su **Connetti**;
