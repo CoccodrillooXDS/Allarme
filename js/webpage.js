@@ -36,9 +36,9 @@ const DESC_ALLARME_SCATTATO_LUCE = "Allarme scattato - luce accesa";
 const ALLARME_SCATTATO_PORTA = "ASP";
 const DESC_ALLARME_SCATTATO_PORTA = "Allarme scattato - porta aperta";
 const ALLARME_SCATTATO_OSTACOLO = "ASO";
-const DESC_ALLARME_SCATTATO_OSTACOLO = "Allarme scattato - possibile ostacolo rilevato";
+const DESC_ALLARME_SCATTATO_OSTACOLO = "Allarme scattato - possibile persona rilevata";
 const ALLARME_SCATTATO_INFRAROSSI = "ASI";
-const DESC_ALLARME_SCATTATO_INFRAROSSI = "Allarme scattato - possibile movimento di un corpo caldo rilevato";
+const DESC_ALLARME_SCATTATO_INFRAROSSI = "Allarme scattato - possibile corpo caldo rilevato";
 const SENSORE_ULTRASUONI = "SUS";
 
 //  =========================
