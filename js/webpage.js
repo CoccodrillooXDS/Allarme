@@ -322,10 +322,10 @@ async function connectSerialDevice() {
                 console.log("Dispositivo già connesso " + error);
             }
         } else if (error.name == "NetworkError") {
-            var notification = UIkit.notification('La porta seriale è attualmente in uso da un altro programma');
+            var notification = UIkit.notification('La porta seriale è attualmente in uso da un altro programma o non è disponibile');
             if (statoNotifiche && notificheStatoSeriale.checked) {
                 var notification = new Notification('Allarme: Stato porta seriale', {
-                    body: 'In uso da un altro programma',
+                    body: 'In uso da un altro programma o non disponibile',
                     requireInteraction: false
                 });
                 setTimeout(function() {
@@ -489,7 +489,7 @@ function readData(data) {
         aggiornaTabella(DESC_ALLARME_SCATTATO_LUCE);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'La luce è stata accesa',
+                body: DESC_ALLARME_SCATTATO_LUCE,
                 requireInteraction: false
             });
             setTimeout(function() {
@@ -509,7 +509,7 @@ function readData(data) {
         aggiornaTabella(DESC_ALLARME_SCATTATO_PORTA);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'La porta è stata aperta',
+                body: DESC_ALLARME_SCATTATO_PORTA,
                 requireInteraction: false
             });
             setTimeout(function() {
@@ -529,7 +529,7 @@ function readData(data) {
         aggiornaTabella(DESC_ALLARME_SCATTATO_OSTACOLO);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'Un ostacolo è stato rilevato',
+                body: DESC_ALLARME_SCATTATO_OSTACOLO,
                 requireInteraction: false
             });
             setTimeout(function() {
@@ -549,7 +549,7 @@ function readData(data) {
         aggiornaTabella(DESC_ALLARME_SCATTATO_INFRAROSSI);
         if (statoNotifiche && notificheAllarmeScattato.checked) {
             var notification = new Notification('Allarme: Movimento rilevato', {
-                body: 'Infrarossi rilevati',
+                body: DESC_ALLARME_SCATTATO_INFRAROSSI,
                 requireInteraction: false
             });
             setTimeout(function() {
